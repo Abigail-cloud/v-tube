@@ -12,10 +12,7 @@ const databaseConfig: { [key: string]: import("knex").Knex.Config } = {
   development: {
     client: 'pg',
     connection: {
-      host: '127.0.0.1',
-      user: "postgres",
-      password: "postoat4",
-      database: 'v_stream',
+      
     },
     pool: {
       min: 2,
@@ -33,10 +30,7 @@ const databaseConfig: { [key: string]: import("knex").Knex.Config } = {
   production: {
     client: 'pg',
     connection: {
-      host: '127.0.0.1',
-      user: "postgres",
-      password: "postoat4",
-      database: 'v_tube',
+     
     },
     pool: {
       min: 2,
