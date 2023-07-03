@@ -1,37 +1,34 @@
 import { UserInfo, UserInput } from "../Interfaces/user.type";
 import User from "../Model/user.model";
-import {comparePassword, encryptPassword} from '../Utilities/Encrypt';
-import {omit} from 'lodash';
+import ErrorUtil from "../Utilities/Error/create,error";
+ export default class UserService {
+   public async updateUser(
+     id: string,
+     body: object,
+     userId: string
+   ): Promise<any> {
+     if (id !== userId) {
+       throw ErrorUtil.createError(403, 'You can update only your account!');
+     }
+     const updatedUser = await User
+       .query()
+       .findById(id)
+       .patch(body)
+       .returning('*');
+     return updatedUser;
+   }
 
+   public async deleteUser(id: number, userId: number): Promise<string> {
+     if (id !== userId) {
+       throw ErrorUtil.createError(403, 'You can delete only your account!');
+     }
 
+     await User.query().findById(id).delete();
+     return 'User has been deleted.';
+   }
 
- export default class Authservice {
-    
-    public async register (payload : UserInput) : Promise<User>{
-        try {
-            const hashPassword = encryptPassword(payload.password)
-            const user = await User.query().insert({
-                ...payload,
-                password: hashPassword
-            });
-            return omit((user).toJSON(), "password") as User;
-        } catch (error : any) {
-            throw new Error(error);
-        }
-      
-    }
-
-    public async validatePassword (email : string, password : string) : Promise<boolean>{
-        const user = await User.query().findOne({email});
-        if(!user){
-            return false;
-        }
-        const isValid = comparePassword(password, user.password);
-        return isValid;
-    }
-
-    public async findUser (query : any): Promise<User | undefined>{
-        const user = await User.query().findOne(query)
-        return user;
-    }
-}
+   public async getUser(id: number): Promise<any> {
+     const user = await User.query().findById(id);
+     return user;
+   }
+ }

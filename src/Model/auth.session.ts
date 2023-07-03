@@ -3,23 +3,23 @@ import User from "../Model/user.model";
 import { Session } from "../Interfaces/session";
 
 
-export class SessionModel extends Model implements Session {
+export class SessionModel extends Model {
   id!: number;
-  user_id!: number;
+  user!: number;
   valid!: boolean;
   userAgent!: string;
   createdAt!: Date;
-  updatedAt!: Date;
+  updated_at!: Date;
 
-  static tableName = "sessions";
+  static tableName = 'sessions';
 
   static relationMappings = {
-    user: {
+    users: {
       relation: Model.BelongsToOneRelation,
       modelClass: User,
       join: {
-        from: "sessions.user_id",
-        to: "users.id",
+        from: 'sessions.user',
+        to: 'users.id',
       },
     },
   };

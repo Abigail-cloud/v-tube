@@ -1,8 +1,8 @@
 export interface Session {
-    id: number;
-    user_id: number;
-    valid: boolean;
-    userAgent: string;
-    createdAt: Date;
-    updatedAt: Date;
-  }
+  id: number;
+  user: number;
+  valid: boolean;
+  userAgent: string;
+  createdAt: Date;
+  updated_at: Date;
+}

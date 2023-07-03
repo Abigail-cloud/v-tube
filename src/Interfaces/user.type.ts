@@ -1,3 +1,4 @@
+import User from "../Model/user.model";
 
 export interface UserInfo{
     user_name: string,
@@ -13,3 +14,8 @@ export interface UserInput {
     user_name: string;
     password: string;
   }
+  // Extend the Request interface to include the 'user' property
+export interface CustomRequest extends Request {
+  user: any; // Adjust the type according to your application's user object type
+  cookies: any;
+}

@@ -1,42 +1,63 @@
-import { get } from "lodash";
-import config from "config"
-import { Session } from "../Interfaces/session";
-import { SessionModel } from "../Model/auth.session";
-import { signJwt, verifyJwt } from "../Utilities/jwt.utils";
-import Authservice from "./user.services";
-
-
-const authService = new Authservice;
+import Userservice from "./user.services";
+import User from "../Model/user.model";
+import { UserInput } from "../Interfaces/user.type";
+import { encryptPassword, comparePassword } from "../Utilities/Encrypt";
+import { omit } from "lodash";
+import ErrorUtil from "../Utilities/Error/create,error";
+import JwtUtil from "../Utilities/jwt.utils";
+import config from "config";
 
 export default class AuthSessionservice {
-    
-    public async createSessions (userId : number, userAgent : string) : Promise<Session>{
-        const userSession = await SessionModel.query().insert({user_id: userId,userAgent});
-        return userSession;
-    } 
-    public async findSession (query : object) : Promise<Session[]>{
-        const userSession = await SessionModel.query().where(query)
-        return userSession;
+  public async register(payload: UserInput): Promise<User> {
+    try {
+      const hashPassword = encryptPassword(payload.password);
+      const user = await User.query().insert({
+        ...payload,
+        password: hashPassword,
+      });
+      return omit(user.toJSON(), 'password') as User;
+    } catch (error: any) {
+      throw new Error(error);
     }
-    
-    public async updateSession (query : object, update: object) : Promise<void>{
-       await SessionModel.query().where(query).patch(update)
-    } 
+  }
+  public async signin(email: string, password: string): Promise<any> {
+    const secretKey = config.get<string>('secretKey');
+    try {
+      const user = await User.query().findOne({ email });
+      if (!user) throw ErrorUtil.createError(404, 'User not found!');
 
-    public async re_issueAccessToken (refreshToken : string) : Promise<string |false>{
-       const decoded = verifyJwt(refreshToken, "refreshTokenPublicKey");
-       
-       if(!decoded || !get(decoded, "session")) return false;
+      const isCorrect = comparePassword(password, user.password);
 
-       const session = await SessionModel.query().findById(get(decoded, "session"));
-       if(!session || !session.valid) return false;
-       const user = await authService.findUser({id :session.user_id });
-       if(!user) return false;
-       const accessToken = signJwt(
-        {...user, session : session.id},
-        "accessTokenPrivateKey",
-        {expiresIn: config.get("accessTokenTtl")}
-       );
-       return accessToken; 
-    } 
+      if (!isCorrect)
+        throw ErrorUtil.createError(400, 'Wrong Credentials!');
+
+      const token = JwtUtil.signJwt({ id: user.id }, secretKey);
+      const { password: _, ...others } = user;
+
+      return { token, user: others };
+    } catch (err) {
+      throw err;
+    }
+  }
+  public static async googleAuth(userData: any): Promise<any> {
+    const publicKey = config.get<string>('publicKey');
+    const user = await User.query().findOne({ email: userData.email });
+
+    if (user) {
+      const token = JwtUtil.signJwt({ id: user.id }, publicKey);
+      return { token, user };
+    } else {
+      const newUser = await User.query().insert({
+        ...userData,
+        from_google: true,
+      });
+
+      const updatedUser = await User.query().patch();
+      console.log(updatedUser);
+      
+
+      const token = JwtUtil.signJwt({ id: updatedUser}, publicKey);
+      return { token, user: updatedUser };
+    }
+  }
 }
