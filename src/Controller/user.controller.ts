@@ -59,5 +59,55 @@ export class UserHandler {
     }
   }
 
-}
+  // public async subscribe(
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ): Promise<void> {
+  //   try {
+  //     await this.userService.subscribe(req.user.id, req.params.id);
+  //     res.status(200).json('Subscription successful.');
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // }
 
+  // public async unsubscribe(
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ): Promise<void> {
+  //   try {
+  //     await this.userService.unsubscribe(req.user.id, req.params.id);
+  //     res.status(200).json('Unsubscription successful.');
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // }
+
+  // public async like(
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ): Promise<void> {
+  //   try {
+  //     await this.userService.like(req.user.id, req.params.videoId);
+  //     res.status(200).json('The video has been liked.');
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // }
+
+  // public async dislike(
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ): Promise<void> {
+  //   try {
+  //     await this.userService.dislike(req.user.id, req.params.videoId);
+  //     res.status(200).json('The video has been disliked.');
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // }
+}
